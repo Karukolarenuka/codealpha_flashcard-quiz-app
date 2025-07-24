@@ -1,33 +1,78 @@
-const quotes = [
-  {
-    text: "The best way to predict the future is to create it.",
-    author: "Peter Drucker"
-  },
-  {
-    text: "Life is 10% what happens to us and 90% how we react to it.",
-    author: "Charles R. Swindoll"
-  },
-  {
-    text: "Your time is limited, so don’t waste it living someone else’s life.",
-    author: "Steve Jobs"
-  },
-  {
-    text: "Strive not to be a success, but rather to be of value.",
-    author: "Albert Einstein"
-  },
-  {
-    text: "Success is not final, failure is not fatal: It is the courage to continue that counts.",
-    author: "Winston Churchill"
-  }
+let flashcards = [
+  { question: "What is the capital of France?", answer: "Paris" },
+  { question: "2 + 2 = ?", answer: "4" }
 ];
 
-function newQuote() {
-  const randomIndex = Math.floor(Math.random() * quotes.length);
-  const quote = quotes[randomIndex];
+let currentIndex = 0;
+let showingAnswer = false;
 
-  document.getElementById("quote-text").textContent = `"${quote.text}"`;
-  document.getElementById("quote-author").textContent = `— ${quote.author}`;
+function displayCard() {
+  const front = document.getElementById("card-front");
+  const back = document.getElementById("card-back");
+  front.textContent = flashcards[currentIndex].question;
+  back.textContent = flashcards[currentIndex].answer;
+  front.classList.remove("hidden");
+  back.classList.add("hidden");
+  showingAnswer = false;
 }
 
-// Load a quote on initial page load
-window.onload = newQuote;
+function toggleAnswer() {
+  const front = document.getElementById("card-front");
+  const back = document.getElementById("card-back");
+  if (showingAnswer) {
+    front.classList.remove("hidden");
+    back.classList.add("hidden");
+  } else {
+    front.classList.add("hidden");
+    back.classList.remove("hidden");
+  }
+  showingAnswer = !showingAnswer;
+}
+
+function nextCard() {
+  if (flashcards.length === 0) return;
+  currentIndex = (currentIndex + 1) % flashcards.length;
+  displayCard();
+}
+
+function prevCard() {
+  if (flashcards.length === 0) return;
+  currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+  displayCard();
+}
+
+function addCard() {
+  const q = document.getElementById("question").value.trim();
+  const a = document.getElementById("answer").value.trim();
+  if (q && a) {
+    flashcards.push({ question: q, answer: a });
+    currentIndex = flashcards.length - 1;
+    displayCard();
+    document.getElementById("question").value = '';
+    document.getElementById("answer").value = '';
+  }
+}
+
+function editCard() {
+  const q = document.getElementById("question").value.trim();
+  const a = document.getElementById("answer").value.trim();
+  if (flashcards.length === 0) return;
+  if (q) flashcards[currentIndex].question = q;
+  if (a) flashcards[currentIndex].answer = a;
+  displayCard();
+}
+
+function deleteCard() {
+  if (flashcards.length === 0) return;
+  flashcards.splice(currentIndex, 1);
+  currentIndex = Math.max(0, currentIndex - 1);
+  if (flashcards.length === 0) {
+    document.getElementById("card-front").textContent = "No flashcards.";
+    document.getElementById("card-back").textContent = "";
+  } else {
+    displayCard();
+  }
+}
+
+// Initialize
+displayCard();
